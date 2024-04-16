@@ -13,7 +13,7 @@ jobs:
       - image: cimg/node:20.0.0-browsers
 
     resource_class:
-      xlarge
+      large
     working_directory: ~/remix-project
     steps:
       - checkout
@@ -56,7 +56,7 @@ jobs:
       - image: cimg/node:20.0.0-browsers
 
     resource_class:
-      xlarge
+      large
     working_directory: ~/remix-project
     steps:
       - checkout
@@ -82,7 +82,7 @@ jobs:
       docker:
       - image: cimg/node:20.0.0-browsers
       resource_class:
-        xlarge
+        large
       working_directory: ~/remix-project
       parameters:
         plugin:
@@ -108,7 +108,7 @@ jobs:
       machine:
         image: ubuntu-2004:current
       resource_class:
-        xlarge
+        large
       working_directory: ~/remix-project
       steps:
         - run: ldd --version
@@ -138,7 +138,7 @@ jobs:
   build-remixdesktop-windows:
     executor:
       name: win/default # executor type
-      size: xlarge # can be medium, large, xlarge, 2xlarge
+      size: large # can be medium, large, xlarge, 2xlarge
       shell: bash.exe
     working_directory: ~/remix-project
     steps:
@@ -301,7 +301,7 @@ jobs:
     docker:
       - image: cimg/node:20.0.0-browsers
     resource_class:
-      xlarge
+      large
     working_directory: ~/remix-project
 
     steps:
@@ -318,7 +318,7 @@ jobs:
     docker:
       - image: cimg/node:20.0.0-browsers
     resource_class:
-      xlarge
+      large
     working_directory: ~/remix-project
 
     steps:
@@ -344,7 +344,7 @@ jobs:
     docker:
       - image: cimg/node:20.0.0-browsers
     resource_class:
-      xlarge
+      large
     working_directory: ~/remix-project
     parameters:
       browser:
@@ -402,7 +402,7 @@ jobs:
     docker:
       - image: cimg/node:20.0.0-browsers
     resource_class:
-      xlarge
+      large
     working_directory: ~/remix-project
     parameters:
       plugin:
@@ -436,7 +436,7 @@ jobs:
     docker:
       - image: cimg/node:20.0.0-browsers
     resource_class:
-      xlarge
+      large
     working_directory: ~/remix-project
     steps:
       - checkout
@@ -460,7 +460,7 @@ jobs:
       - image: cimg/node:20.0.0-browsers
 
     resource_class:
-      xlarge
+      large
     environment:
       COMMIT_AUTHOR_EMAIL: "yann@ethereum.org"
       COMMIT_AUTHOR: "Circle CI"
