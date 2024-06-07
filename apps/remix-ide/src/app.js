@@ -7,8 +7,10 @@ import {LocaleModule} from './app/tabs/locale-module'
 import {NetworkModule} from './app/tabs/network-module'
 import {Web3ProviderModule} from './app/tabs/web3-provider'
 import {CompileAndRun} from './app/tabs/compile-and-run'
+import {PluginStateLogger} from './app/tabs/state-logger'
 import {SidePanel} from './app/components/side-panel'
 import {HiddenPanel} from './app/components/hidden-panel'
+import {PinnedPanel} from './app/components/pinned-panel'
 import {VerticalIcons} from './app/components/vertical-icons'
 import {LandingPage} from './app/ui/landing-page/landing-page'
 import {MainPanel} from './app/components/main-panel'
@@ -52,8 +54,6 @@ import { electronTemplates } from './app/plugins/electron/templatesPlugin'
 import { xtermPlugin } from './app/plugins/electron/xtermPlugin'
 import { ripgrepPlugin } from './app/plugins/electron/ripgrepPlugin'
 import { compilerLoaderPlugin, compilerLoaderPluginDesktop } from './app/plugins/electron/compilerLoaderPlugin'
-
-import {OpenAIGpt} from './app/plugins/openaigpt'
 import {SolCoder} from './app/plugins/solcoderAI'
 
 const isElectron = require('is-electron')
@@ -231,7 +231,6 @@ class AppComponent {
     const contractFlattener = new ContractFlattener()
 
     // ----------------- AI --------------------------------------
-    const openaigpt = new OpenAIGpt()
     const solcoder = new SolCoder()
 
     // ----------------- import content service ------------------------
@@ -300,7 +299,8 @@ class AppComponent {
     this.layout = new Layout()
 
     const permissionHandler = new PermissionHandlerPlugin()
-
+    // ----------------- run script after each compilation results -----------
+    const pluginStateLogger = new PluginStateLogger()
     
     this.engine.register([
       permissionHandler,
@@ -349,8 +349,8 @@ class AppComponent {
       contractFlattener,
       solidityScript,
       templates,
-      openaigpt,
       solcoder,
+      pluginStateLogger
     ])
 
     //---- fs plugin
@@ -382,13 +382,14 @@ class AppComponent {
     this.menuicons = new VerticalIcons()
     this.sidePanel = new SidePanel()
     this.hiddenPanel = new HiddenPanel()
+    this.pinnedPanel = new PinnedPanel()
 
     const pluginManagerComponent = new PluginManagerComponent(appManager, this.engine)
     const filePanel = new FilePanel(appManager)
     const landingPage = new LandingPage(appManager, this.menuicons, fileManager, filePanel, contentImport)
     this.settings = new SettingsTab(Registry.getInstance().get('config').api, editor, appManager)
 
-    this.engine.register([this.menuicons, landingPage, this.hiddenPanel, this.sidePanel, filePanel, pluginManagerComponent, this.settings])
+    this.engine.register([this.menuicons, landingPage, this.hiddenPanel, this.sidePanel, filePanel, pluginManagerComponent, this.settings, this.pinnedPanel])
 
     // CONTENT VIEWS & DEFAULT PLUGINS
     const openZeppelinProxy = new OpenZeppelinProxy(blockchain)
@@ -466,10 +467,12 @@ class AppComponent {
       'compilerArtefacts',
       'network',
       'web3Provider',
-      'offsetToLineColumnConverter'
+      'offsetToLineColumnConverter',
+      'pluginStateLogger'
     ])
     await this.appManager.activatePlugin(['mainPanel', 'menuicons', 'tabs'])
     await this.appManager.activatePlugin(['sidePanel']) // activating  host plugin separately
+    await this.appManager.activatePlugin(['pinnedPanel'])
     await this.appManager.activatePlugin(['home'])
     await this.appManager.activatePlugin(['settings', 'config'])
     await this.appManager.activatePlugin([
@@ -505,7 +508,7 @@ class AppComponent {
         await this.appManager.registerContextMenuItems()
       }
     )
-    await this.appManager.activatePlugin(['solidity-script', 'openaigpt'])
+    await this.appManager.activatePlugin(['solidity-script'])
     await this.appManager.activatePlugin(['solcoder'])
 
     
@@ -564,12 +567,26 @@ class AppComponent {
                 }
               }
             }
+          }).then(async () => {
+            const lastPinned = localStorage.getItem('pinnedPlugin')
+
+            if (lastPinned) {
+              this.appManager.call('sidePanel', 'pinView', JSON.parse(lastPinned))
+            }
           })
           .catch(console.error)
       }
       const loadedElement = document.createElement('span')
       loadedElement.setAttribute('data-id', 'apploaded')
       document.body.appendChild(loadedElement)
+    })
+
+    this.appManager.on('pinnedPanel', 'pinnedPlugin', (pluginProfile) => {
+      localStorage.setItem('pinnedPlugin', JSON.stringify(pluginProfile))
+    })
+
+    this.appManager.on('pinnedPanel', 'unPinnedPlugin', () => {
+      localStorage.setItem('pinnedPlugin', '')
     })
 
     // activate solidity plugin

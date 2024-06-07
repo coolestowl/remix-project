@@ -71,13 +71,14 @@ let requiredModules = [ // services + layout views + system views
   'vyperCompilationDetails',
   'contractflattener',
   'solidity-script',
-  'openaigpt',
   'solcoder',
   'home',
   'doc-viewer',
   'doc-gen',
   'remix-templates',
-  'solhint'
+  'solhint',
+  'pinnedPanel',
+  'pluginStateLogger'
 ]
 
 

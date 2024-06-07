@@ -267,7 +267,7 @@ export function UniversalDappUI(props: UdappProps) {
             </span>) }
           </div>
           <div className="btn" style={{ padding: '0.15rem' }}>
-            <CopyToClipboard tip={intl.formatMessage({ id: 'udapp.copy' })} content={address} direction={'top'} />
+            <CopyToClipboard tip={intl.formatMessage({ id: 'udapp.copyAddress' })} content={address} direction={'top'} />
           </div>
           { props.isPinnedContract ? ( <div className="btn" style={{ padding: '0.15rem', marginLeft: '-0.5rem' }}>
             <CustomTooltip placement="top" tooltipClasses="text-nowrap" tooltipId="udapp_udappUnpinTooltip" tooltipText={<FormattedMessage id="udapp.tooltipTextUnpin" />}>
@@ -297,7 +297,16 @@ export function UniversalDappUI(props: UdappProps) {
             <label>
               <b><FormattedMessage id="udapp.balance" />:</b> {instanceBalance} ETH
             </label>
-            {props.exEnvironment && props.exEnvironment.startsWith('injected') && <i className="fas fa-edit btn btn-sm p-0" onClick={() => {props.editInstance(props.instance)}}></i>}
+            {props.exEnvironment && props.exEnvironment.startsWith('injected') && (
+              <CustomTooltip placement="top" tooltipClasses="text-nowrap" tooltipId="udapp_udappEditTooltip" tooltipText={<FormattedMessage id="udapp.tooltipTextEdit" />}>
+                <i
+                  className="fas fa-edit btn btn-sm p-0"
+                  onClick={() => {
+                    props.editInstance(props.instance)
+                  }}
+                ></i>
+              </CustomTooltip>
+            )}
           </div>
           { props.isPinnedContract && props.instance.pinnedAt ? (
             <div className="d-flex" data-id="instanceContractPinnedAt">
